@@ -2,20 +2,27 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flosendo - Entrepreneurship Education</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="description" content="Flosendo - Reimagining education through fun, effective and collaborative enrichment learning for K12 students">
+    <title>Flosendo - Enrichment Learning</title>
     <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        'baloo': ['Baloo 2', 'cursive'],
-                    },
-                    colors: {
-                        'primary': '#7B2EFF',
-                        'secondary': '#C6FF4F',
+        // Wait for Tailwind to load before configuring
+        if (typeof tailwind !== 'undefined') {
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        fontFamily: {
+                            'baloo': ['Baloo 2', 'cursive'],
+                        },
+                        colors: {
+                            'primary': '#7B2EFF',
+                            'secondary': '#C6FF4F',
+                        },
+                        screens: {
+                            'xs': '475px',
+                        }
                     }
                 }
             }
@@ -24,7 +31,16 @@
     <style>
         body {
             font-family: 'Baloo 2', cursive;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
+        
+        /* Prevent horizontal scroll on mobile */
+        html, body {
+            overflow-x: hidden;
+            position: relative;
+        }
+        
         .page {
             display: none;
         }
@@ -38,6 +54,87 @@
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        
+        /* Mobile menu styles */
+        .mobile-menu {
+            transform: translateX(100%);
+            transition: transform 0.3s ease-in-out;
+        }
+        .mobile-menu.active {
+            transform: translateX(0);
+        }
+        
+        /* Prevent body scroll when menu is open */
+        body.menu-open {
+            overflow: hidden;
+        }
+        
+        /* Touch-friendly tap targets */
+        button, a, input, textarea {
+            min-height: 44px;
+            min-width: 44px;
+        }
+        
+        /* Better focus states for mobile */
+        button:focus-visible, 
+        a:focus-visible, 
+        input:focus-visible {
+            outline: 3px solid #7B2EFF;
+            outline-offset: 2px;
+        }
+        
+        /* Smooth scrolling for better mobile experience */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* Responsive text that doesn't overflow */
+        .responsive-heading {
+            font-size: clamp(3rem, 15vw, 9rem);
+            line-height: 1;
+        }
+        
+        .responsive-subheading {
+            font-size: clamp(1.5rem, 8vw, 3.75rem);
+            line-height: 1.1;
+        }
+        
+        /* Prevent text selection on buttons for better mobile UX */
+        button {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        /* Improve form inputs on mobile */
+        input, textarea {
+            font-size: 16px; /* Prevents zoom on iOS */
+        }
+        
+        /* Loading state for form */
+        .button-loading {
+            position: relative;
+            color: transparent;
+        }
+        .button-loading::after {
+            content: "";
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            top: 50%;
+            left: 50%;
+            margin-left: -10px;
+            margin-top: -10px;
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spinner 0.6s linear infinite;
+        }
+        @keyframes spinner {
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body class="bg-gray-50 font-baloo pt-16">
@@ -45,12 +142,41 @@
     <nav class="bg-white shadow-lg fixed top-0 z-50 w-full">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
                 <div class="flex-shrink-0">
-                    <h1 onclick="showPage('landing')" class="text-2xl font-bold text-primary cursor-pointer">Flosendo</h1>
+                    <h1 onclick="showPage('landing')" class="text-xl sm:text-2xl font-bold text-primary cursor-pointer hover:opacity-80 transition-opacity">Flosendo</h1>
                 </div>
-                <div class="flex space-x-4">
-                    <button onclick="showPage('subscribe')" class="nav-btn px-4 py-2 rounded-lg bg-primary text-white hover:bg-primary/90 hover:scale-105 transition-all duration-200 shadow-md">Waitlist</button>
+                
+                <!-- Desktop Navigation -->
+                <div class="hidden sm:flex space-x-4">
+                    <button onclick="showPage('subscribe')" class="nav-btn px-4 py-2 rounded-lg bg-primary text-white hover:bg-primary/90 hover:scale-105 transition-all duration-200 shadow-md">
+                        Join Waitlist
+                    </button>
                 </div>
+                
+                <!-- Mobile menu button -->
+                <div class="sm:hidden">
+                    <button onclick="toggleMobileMenu()" class="p-2 rounded-lg text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary" aria-label="Menu">
+                        <svg id="menu-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                        <svg id="close-icon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="mobile-menu fixed top-16 right-0 w-full sm:hidden bg-white shadow-lg">
+            <div class="px-4 py-4 space-y-2">
+                <button onclick="showPage('landing'); toggleMobileMenu()" class="mobile-nav-btn block w-full text-left px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors">
+                    Home
+                </button>
+                <button onclick="showPage('subscribe'); toggleMobileMenu()" class="mobile-nav-btn block w-full text-left px-4 py-3 rounded-lg bg-primary text-white hover:bg-primary/90 transition-colors">
+                    Join Waitlist
+                </button>
             </div>
         </div>
     </nav>
@@ -58,46 +184,49 @@
     <!-- Landing Page -->
     <div id="landing" class="page active bg-gradient-to-br from-primary/10 to-secondary/10">
         <!-- First Screen: Logo and Slogan -->
-        <section class="min-h-screen flex items-center">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 w-full">
+        <section class="min-h-screen flex items-center px-4 sm:px-6 lg:px-8">
+            <div class="max-w-7xl mx-auto py-8 sm:py-16 w-full">
                 <div class="text-center fade-in">
-                    <h1 class="text-[7.5rem] md:text-[9rem] font-bold text-primary">Flosendo</h1>
-                    <p class="mt-0 leading-none text-[3rem] md:text-[3.75rem] text-black" style="font-family: 'Cavolini', 'Baloo 2', cursive; font-style: italic;">
+                    <h1 class="responsive-heading font-bold text-primary mb-2 sm:mb-4">Flosendo</h1>
+                    <p class="responsive-subheading text-black" style="font-family: 'Cavolini', 'Baloo 2', cursive; font-style: italic;">
                         Where young minds bloom
                     </p>
                 </div>
             </div>
         </section>
 
-        <!-- Second Screen: Original landing content -->
-        <section class="min-h-screen flex items-center">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <!-- Second Screen: Mission Statement -->
+        <section class="min-h-screen flex items-center px-4 sm:px-6 lg:px-8">
+            <div class="max-w-7xl mx-auto py-8 sm:py-16 w-full">
                 <div class="text-center fade-in">
-                    <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-8">
-                        Fun Effective Collaborative Enrichment Learning
-                    </h1>
-                    <div class="max-w-5xl mx-auto">
-                        <p class="text-lg md:text-xl text-gray-700 leading-relaxed whitespace-nowrap mb-2">Reimagining education through fun, effective and collaborative enrichment learning.</p>
-                        <p class="text-lg md:text-xl text-gray-700 leading-relaxed whitespace-nowrap mb-2">K12 students learn future skills through bite sized hybrid content developing critical thinking, creativity and curiosity.</p>
-                        <p class="text-lg md:text-xl text-gray-700 leading-relaxed whitespace-nowrap mb-8">Skills that set students apart in a world with AI.</p>
+                    <h2 class="text-3xl sm:text-5xl md:text-6xl font-bold text-gray-900 mb-6 sm:mb-8">
+                        Fun, effective, collaborative enrichment learning
+                    </h2>
+                    <div class="max-w-5xl mx-auto space-y-4">
+                        <p class="text-base sm:text-lg md:text-xl text-gray-700 leading-relaxed px-2">
+                            K12 students learn future skills through bite-sized hybrid content developing critical thinking, creativity and curiosity.
+                        </p>
+                        <p class="text-base sm:text-lg md:text-xl text-gray-700 leading-relaxed px-2">
+                            Skills that set students apart in a world with AI.
+                        </p>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- Third Screen: Product Information -->
-        <section class="min-h-screen flex items-center">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <section class="min-h-screen flex items-center px-4 sm:px-6 lg:px-8">
+            <div class="max-w-7xl mx-auto py-8 sm:py-16 w-full">
                 <div class="text-center fade-in">
-                    <h1 class="text-5xl md:text-6xl font-bold text-gray-900 mb-8">
+                    <h2 class="text-3xl sm:text-5xl md:text-6xl font-bold text-gray-900 mb-6 sm:mb-8">
                         Product Information
-                    </h1>
+                    </h2>
                     <div class="max-w-3xl mx-auto">
-                        <p class="text-xl text-gray-700 leading-relaxed mb-8">
+                        <p class="text-base sm:text-lg md:text-xl text-gray-700 leading-relaxed mb-6 sm:mb-8 px-2">
                             Explore engaging courses designed to spark critical thinking and entrepreneurial spirit in every student. Launching entrepreneurship courses in 2026 for KS2 and KS3 in the UK. Join our waitlist to discover how we help students thrive in a changing world.
                         </p>
-                        <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                            <button onclick="showPage('subscribe')" class="bg-secondary text-gray-900 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-secondary/90 transition-colors duration-200 shadow-lg">
+                        <div class="flex flex-col sm:flex-row gap-4 justify-center px-4">
+                            <button onclick="showPage('subscribe')" class="w-full sm:w-auto bg-secondary text-gray-900 px-6 sm:px-8 py-3 rounded-lg text-base sm:text-lg font-semibold hover:bg-secondary/90 active:scale-95 transition-all duration-200 shadow-lg">
                                 Join Waitlist
                             </button>
                         </div>
@@ -107,50 +236,64 @@
         </section>
     </div>
 
-    
-
     <!-- Subscribe Page -->
     <div id="subscribe" class="page bg-gradient-to-br from-primary/5 to-secondary/5">
-        <!-- First Screen: Waitlist intro + form -->
-        <section id="waitlist-top" class="min-h-screen py-16 flex items-center">
+        <!-- First Screen: Waitlist form -->
+        <section id="waitlist-top" class="min-h-screen py-8 sm:py-16 flex items-center">
             <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-                <div class="text-center mb-12 fade-in">
-                    <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">Join our <span class="text-primary">waitlist</span></h2>
-                    <p class="text-lg md:text-xl text-gray-700">We're launching in 2026. Interested in piloting a Flosendo course. Join our waitlist now.</p>
+                <div class="text-center mb-8 sm:mb-12 fade-in">
+                    <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-3 sm:mb-4">
+                        Join our <span class="text-primary">waitlist</span>
+                    </h2>
+                    <p class="text-base sm:text-lg md:text-xl text-gray-700 px-2">
+                        We're launching in 2026. Interested in piloting a Flosendo course? Join our waitlist now.
+                    </p>
                 </div>
-                <div class="bg-white rounded-2xl shadow-xl p-8 md:p-12 fade-in">
-                    <form id="contactForm" class="space-y-6">
-                        <div class="grid md:grid-cols-2 gap-6">
+                <div class="bg-white rounded-xl sm:rounded-2xl shadow-xl p-6 sm:p-8 md:p-12 fade-in">
+                    <form id="contactForm" class="space-y-4 sm:space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                             <div>
-                                <label for="fullName" class="block text-sm font-medium text-gray-700 mb-2">Full Name <span class="text-red-500">*</span></label>
+                                <label for="fullName" class="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">
+                                    Full Name <span class="text-red-500">*</span>
+                                </label>
                                 <input type="text" 
                                        id="fullName" 
                                        name="fullName" 
                                        required 
-                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors duration-200">
+                                       autocomplete="name"
+                                       class="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors duration-200">
                             </div>
                             <div>
-                                <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email <span class="text-red-500">*</span></label>
+                                <label for="email" class="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">
+                                    Email <span class="text-red-500">*</span>
+                                </label>
                                 <input type="email" 
                                        id="email" 
                                        name="email" 
                                        required 
-                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors duration-200">
+                                       autocomplete="email"
+                                       class="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors duration-200">
                             </div>
                         </div>
                         <div>
-                            <label for="schoolName" class="block text-sm font-medium text-gray-700 mb-2">School Name <span class="text-red-500">*</span></label>
+                            <label for="schoolName" class="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">
+                                School Name <span class="text-red-500">*</span>
+                            </label>
                             <input type="text" 
                                    id="schoolName" 
                                    name="schoolName" 
                                    required 
-                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors duration-200">
+                                   autocomplete="organization"
+                                   class="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors duration-200">
                         </div>
-                        <button type="submit" class="w-full bg-primary text-white py-3 px-6 rounded-lg text-lg font-semibold hover:bg-primary/90 transition-colors duration-200 shadow-lg">Join</button>
+                        <button type="submit" 
+                                class="w-full bg-primary text-white py-3 px-6 rounded-lg text-base sm:text-lg font-semibold hover:bg-primary/90 active:scale-95 transition-all duration-200 shadow-lg touch-manipulation">
+                            Join
+                        </button>
                     </form>
-                    <div id="formMessage" class="mt-6 hidden">
-                        <div class="p-4 rounded-lg text-center">
-                            <p class="text-lg font-medium"></p>
+                    <div id="formMessage" class="mt-4 sm:mt-6 hidden">
+                        <div class="p-3 sm:p-4 rounded-lg text-center">
+                            <p class="text-base sm:text-lg font-medium"></p>
                         </div>
                     </div>
                 </div>
@@ -158,18 +301,51 @@
         </section>
 
         <!-- Second Screen: Contact info -->
-        <section id="contact-us" class="min-h-screen py-16 flex items-center">
+        <section id="contact-us" class="min-h-screen py-8 sm:py-16 flex items-center">
             <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-                <div class="text-center mb-12 fade-in">
-                    <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">Contact <span class="text-primary">Us</span></h2>
-                    <p class="text-xl text-gray-600 mb-4">Have questions or want to join our waitlist?</p>
-                    <p class="text-lg text-gray-700">Email us - <a href="mailto:enquiries@flosendo.com" class="text-primary hover:underline">enquiries@flosendo.com</a></p>
+                <div class="text-center fade-in">
+                    <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+                        Contact <span class="text-primary">Us</span>
+                    </h2>
+                    <p class="text-lg sm:text-xl text-gray-600 mb-4 px-2">
+                        Have questions or want to join our waitlist?
+                    </p>
+                    <p class="text-base sm:text-lg text-gray-700 px-2">
+                        Email us - 
+                        <a href="mailto:enquiries@flosendo.com" class="text-primary hover:underline inline-block py-1">
+                            enquiries@flosendo.com
+                        </a>
+                    </p>
                 </div>
             </div>
         </section>
     </div>
 
     <script>
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const body = document.body;
+            const menuIcon = document.getElementById('menu-icon');
+            const closeIcon = document.getElementById('close-icon');
+            
+            menu.classList.toggle('active');
+            body.classList.toggle('menu-open');
+            menuIcon.classList.toggle('hidden');
+            closeIcon.classList.toggle('hidden');
+        }
+        
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const menu = document.getElementById('mobile-menu');
+            const menuButton = event.target.closest('button[onclick*="toggleMobileMenu"]');
+            const isClickInsideMenu = menu.contains(event.target);
+            
+            if (!menuButton && !isClickInsideMenu && menu.classList.contains('active')) {
+                toggleMobileMenu();
+            }
+        });
+        
         // Navigation functionality
         function showPage(pageId) {
             // Hide all pages
@@ -184,8 +360,8 @@
                 selectedPage.classList.add('active');
                 selectedPage.classList.add('fade-in');
                 
-                // Always scroll to top of the page when switching pages
-                window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+                // Scroll to top when switching pages
+                window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
             }
             
             // Update navigation buttons
@@ -194,9 +370,9 @@
                 btn.classList.remove('ring-2', 'ring-white', 'ring-offset-2');
             });
 
-            // Highlight only the matching nav button (not the logo)
+            // Highlight matching nav button
             const buttonToHighlight = Array.from(navButtons).find(
-                btn => btn.getAttribute('onclick').includes(`showPage('${pageId}'`)
+                btn => btn.getAttribute('onclick')?.includes(`showPage('${pageId}'`)
             );
             if (buttonToHighlight) {
                 buttonToHighlight.classList.add('ring-2', 'ring-white', 'ring-offset-2');
@@ -209,18 +385,32 @@
             
             const formData = new FormData(this);
             const data = {
-                fullName: formData.get('fullName'),
-                email: formData.get('email'),
-                schoolName: formData.get('schoolName')
+                fullName: formData.get('fullName').trim(),
+                email: formData.get('email').trim(),
+                schoolName: formData.get('schoolName').trim()
             };
+            
+            // Validate
+            if (!data.fullName || !data.email || !data.schoolName) {
+                showMessage('Please fill in all required fields.', 'error');
+                return;
+            }
+            
+            // Email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(data.email)) {
+                showMessage('Please enter a valid email address.', 'error');
+                return;
+            }
             
             const submitButton = this.querySelector('button[type="submit"]');
             const originalText = submitButton.textContent;
             submitButton.textContent = 'Sending...';
             submitButton.disabled = true;
+            submitButton.classList.add('button-loading');
             
             try {
-                const response = await fetch('/subscribe', {
+                const response = await fetch('/api/subscribe', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -230,45 +420,80 @@
                 
                 const result = await response.json();
                 
-                const messageDiv = document.getElementById('formMessage');
-                const messageText = messageDiv.querySelector('p');
-                
                 if (response.ok) {
-                    messageText.textContent = result.message;
-                    messageDiv.className = 'mt-6 p-4 rounded-lg text-center bg-green-100 text-green-800';
+                    showMessage(result.message || 'Successfully joined the waitlist!', 'success');
                     this.reset();
                 } else {
-                    messageText.textContent = result.error || 'An error occurred. Please try again.';
-                    messageDiv.className = 'mt-6 p-4 rounded-lg text-center bg-red-100 text-red-800';
+                    showMessage(result.error || 'An error occurred. Please try again.', 'error');
                 }
-                
-                messageDiv.classList.remove('hidden');
-                
-                // Scroll to message
-                messageDiv.scrollIntoView({ behavior: 'smooth' });
                 
             } catch (error) {
                 console.error('Error:', error);
-                const messageDiv = document.getElementById('formMessage');
-                const messageText = messageDiv.querySelector('p');
-                messageText.textContent = 'Network error. Please check your connection and try again.';
-                messageDiv.className = 'mt-6 p-4 rounded-lg text-center bg-red-100 text-red-800';
-                messageDiv.classList.remove('hidden');
+                showMessage('Network error. Please check your connection and try again.', 'error');
             } finally {
                 submitButton.textContent = originalText;
                 submitButton.disabled = false;
+                submitButton.classList.remove('button-loading');
             }
         });
         
-        // Initialize page
+        // Show message helper
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('formMessage');
+            const messageText = messageDiv.querySelector('p');
+            
+            messageText.textContent = text;
+            
+            if (type === 'success') {
+                messageDiv.className = 'mt-4 sm:mt-6 p-3 sm:p-4 rounded-lg text-center bg-green-100 text-green-800';
+            } else {
+                messageDiv.className = 'mt-4 sm:mt-6 p-3 sm:p-4 rounded-lg text-center bg-red-100 text-red-800';
+            }
+            
+            messageDiv.classList.remove('hidden');
+            
+            // Auto-hide message after 5 seconds
+            setTimeout(() => {
+                messageDiv.classList.add('hidden');
+            }, 5000);
+            
+            // Smooth scroll to message on mobile
+            if (window.innerWidth < 640) {
+                setTimeout(() => {
+                    messageDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }, 100);
+            }
+        }
+        
+        // Handle viewport height on mobile (address bar issue)
+        function setViewportHeight() {
+            const vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
+        }
+        
+        // Initialize
         document.addEventListener('DOMContentLoaded', function() {
-            // Set scroll restoration to manual to prevent browser from auto-scrolling
+            // Set scroll restoration
             if ('scrollRestoration' in history) {
                 history.scrollRestoration = 'manual';
             }
             
+            // Set viewport height
+            setViewportHeight();
+            
             // Ensure page starts at top
             window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+        });
+        
+        // Update viewport height on resize
+        window.addEventListener('resize', setViewportHeight);
+        window.addEventListener('orientationchange', setViewportHeight);
+        
+        // Prevent zoom on form focus (iOS)
+        document.addEventListener('touchstart', function(event) {
+            if (event.touches.length > 1) {
+                event.preventDefault();
+            }
         });
     </script>
 </body>
