@@ -1,12 +1,13 @@
 {
-  "version": 2,
-  "buildCommand": "echo 'Static site - no build needed'",
-  "outputDirectory": "frontend",
-  "installCommand": "echo 'No dependencies to install'",
-  "routes": [
+  "functions": {
+    "api/subscribe.js": {
+      "runtime": "@vercel/node@latest"
+    }
+  },
+  "rewrites": [
     {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/api/subscribe",
+      "destination": "/api/subscribe.js"
     }
   ]
 }
