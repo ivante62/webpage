@@ -147,11 +147,12 @@
                     <h1 onclick="showPage('landing')" class="text-2xl sm:text-3xl md:text-4xl font-bold text-primary cursor-pointer hover:opacity-80 transition-opacity">Flosendo</h1>
                 </div>
                 
-                <!-- Desktop Navigation -->
-                <div class="hidden sm:flex space-x-4">
-                    <button onclick="showPage('subscribe')" class="nav-btn px-4 py-2 rounded-lg bg-primary text-white hover:bg-primary/90 hover:scale-105 transition-all duration-200 shadow-md">
-                        Join waitlist
-                    </button>
+                    <!-- Desktop Navigation -->
+                    <div class="hidden sm:flex space-x-4">
+                        <button onclick="showPage('subscribe', 'waitlist-top')" class="nav-btn px-4 py-2 rounded-lg bg-primary text-white hover:bg-primary/90 hover:scale-105 transition-all duration-200 shadow-md">
+                            Join waitlist
+                        </button>
+                    </div>
                 </div>
                 
                 <!-- Mobile menu button -->
@@ -260,7 +261,7 @@
             
             <!-- CTA Button -->
             <button 
-                onclick="showPage('subscribe')" 
+                onclick="showPage('subscribe', 'waitlist-top')" 
                 aria-label="Join the Flosendo waitlist"
                 class="inline-flex items-center justify-center bg-secondary text-gray-900 px-8 sm:px-10 py-3.5 sm:py-4 rounded-full text-base sm:text-lg font-semibold hover:bg-secondary/90 focus:outline-none focus:ring-4 focus:ring-primary/30 focus:ring-offset-2 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 motion-reduce:transition-none motion-reduce:transform-none">
                 Join waitlist
@@ -378,38 +379,47 @@
             }
         });
         
-        // Navigation functionality
-        function showPage(pageId) {
-            // Hide all pages
-            const pages = document.querySelectorAll('.page');
-            pages.forEach(page => {
-                page.classList.remove('active');
-            });
-            
-            // Show selected page
-            const selectedPage = document.getElementById(pageId);
-            if (selectedPage) {
-                selectedPage.classList.add('active');
-                selectedPage.classList.add('fade-in');
+              // Navigation functionality
+            function showPage(pageId, scrollToElement = null) {
+                // Hide all pages
+                const pages = document.querySelectorAll('.page');
+                pages.forEach(page => {
+                    page.classList.remove('active');
+                });
                 
-                // Scroll to top when switching pages
-                window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
-            }
+                // Show selected page
+                const selectedPage = document.getElementById(pageId);
+                if (selectedPage) {
+                    selectedPage.classList.add('active');
+                    selectedPage.classList.add('fade-in');
+                    
+                    // Scroll to specific element or top
+                    if (scrollToElement) {
+                        setTimeout(() => {
+                            const element = document.getElementById(scrollToElement);
+                            if (element) {
+                                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            }
+                        }, 100);
+                    } else {
+                        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+                    }
+                }
+                
+                // Update navigation buttons
+                const navButtons = document.querySelectorAll('.nav-btn');
+                navButtons.forEach(btn => {
+                    btn.classList.remove('ring-2', 'ring-white', 'ring-offset-2');
+                });
             
-            // Update navigation buttons
-            const navButtons = document.querySelectorAll('.nav-btn');
-            navButtons.forEach(btn => {
-                btn.classList.remove('ring-2', 'ring-white', 'ring-offset-2');
-            });
-
-            // Highlight matching nav button
-            const buttonToHighlight = Array.from(navButtons).find(
-                btn => btn.getAttribute('onclick')?.includes(`showPage('${pageId}'`)
-            );
-            if (buttonToHighlight) {
-                buttonToHighlight.classList.add('ring-2', 'ring-white', 'ring-offset-2');
+                // Highlight matching nav button
+                const buttonToHighlight = Array.from(navButtons).find(
+                    btn => btn.getAttribute('onclick')?.includes(`showPage('${pageId}'`)
+                );
+                if (buttonToHighlight) {
+                    buttonToHighlight.classList.add('ring-2', 'ring-white', 'ring-offset-2');
+                }
             }
-        }
         
         // Form submission
         document.getElementById('contactForm').addEventListener('submit', async function(e) {
