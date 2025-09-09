@@ -1,7 +1,7 @@
 {
   "functions": {
     "api/subscribe.js": {
-      "runtime": "@vercel/node@20"
+      "runtime": "@vercel/node@20.11.0"
     }
   },
   "rewrites": [
@@ -11,3 +11,4 @@
     }
   ]
 }
+
